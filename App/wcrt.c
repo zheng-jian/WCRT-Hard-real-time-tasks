@@ -1,19 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-//#include "wcrt.h"
+#include "wcrt.h"
 
-struct task
-{
-	int execution_time;
-	int inter_arrival_time;
-	int deadline;
-	int priority;
 
-	struct task *next;
-	struct task *last;
-};
-
+struct task *initialization(struct task *t,int a){
+	t=(struct task*)malloc(a*sizeof(struct task));
+	for(int j=0;j<a;j++){
+		(t+j)->next=(struct task*)malloc(sizeof(struct task));
+		(t+j)->last=(struct task*)malloc(sizeof(struct task));
+	}
+	return t;
+}
 void read_information(FILE *fp, char *filename, struct task *a,int nmax){	
 	int i=0;
 	if((fp=fopen(filename,"r"))==NULL){
@@ -120,15 +118,14 @@ int main(int argc, char *argv[]){
 	FILE *fp=NULL;
 	int a=count_lines_number(fp,argv[1]);
 	printf("%d\n",a );
-	struct task *t=(struct task*)malloc(a*sizeof(struct task));
-	for(int j=0;j<a;j++){
-		(t+j)->next=(struct task*)malloc(sizeof(struct task));
-		(t+j)->last=(struct task*)malloc(sizeof(struct task));
-	}
+	struct task *t=NULL;
+    t=initialization(t,a);
 	read_information(fp,argv[1],t,a);
+
 	for(int k=0;k<a;k++){
 		printf("%d %d %d %d\n",(t+k)->execution_time,(t+k)->inter_arrival_time,(t+k)->deadline,(t+k)->priority);
 	}
+
 	struct task *p=t;
 	struct task *q=t->next;
 	struct task *q2=t->next->next;

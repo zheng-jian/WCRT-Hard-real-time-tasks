@@ -8,12 +8,17 @@ struct task
 	int deadline;
 	int priority;
 
-	struct task *next=NULL;
-	struct task *last=NULL;
+	struct task *next;
+	struct task *last;
 };
+struct task *initialization(struct task *t,int a);
 
-void read_information();
+void read_information(FILE *fp, char *filename, struct task *a,int nmax);
+
+int count_lines_number(FILE *fp,char *name);
 
 int find_max(int *table);
 
-int wcrt(task t);
+int wcrt(struct task *t,int priority);
+
+#endif
