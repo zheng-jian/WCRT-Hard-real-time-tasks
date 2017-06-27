@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 //#include "wcrt.h"
 
 struct task
@@ -33,7 +34,7 @@ void read_information(FILE *fp, char *filename, struct task *a,int nmax){
 		}
 		else
 			a->next=a+1;
-
+		i++;
 		a++;
 	}
 	rewind(fp);
@@ -60,6 +61,59 @@ int count_lines_number(FILE *fp,char *name){
 	return n;
 }
 
+int find_max(int *w){
+	int temp=0;
+	for (int i = 0; i < 20; ++i)
+	{
+		if(w[i]>temp)
+			temp=w[i];
+	}
+	return temp;
+}
+
+int wcrt(struct task *t,int priority){
+	if(t->last==NULL)
+		return t->execution_time;
+	else
+	{	
+		struct task *p=t;
+		int w0=t->execution_time;
+		int num_highPriority=t->priority-1;
+		int *table_exeT=(int *)malloc(sizeof(int)*num_highPriority);
+		int *table_intT=(int *)malloc(sizeof(int)*num_highPriority);
+		for(int i=0;i<num_highPriority;i++){
+			table_exeT[i]=p->last->execution_time;
+			table_intT[i]=p->last->inter_arrival_time;
+			p=p->last;
+
+		}
+		int w[20]={1};
+		int q=0;
+		int q1=1;
+		w0=t->execution_time;
+
+		for(int i=0;i<20;i++){
+			while(1){
+			int sum=0;
+			for(int j=0;j<num_highPriority;j++){
+				sum=sum+(w0+table_intT[j]-1)/table_intT[j]*table_exeT[j];
+			}
+			int q1=(i+1)*t->execution_time+sum;
+			w0=q1;
+			if(q1==q){
+				w[i]=q1-i*t->inter_arrival_time;
+				w0=t->execution_time;
+				break;
+			}else{
+				q=q1;
+			}
+		}
+	}
+		int max=find_max(w);
+		return max;
+	}
+
+}
 
 
 int main(int argc, char *argv[]){
@@ -75,6 +129,12 @@ int main(int argc, char *argv[]){
 	for(int k=0;k<a;k++){
 		printf("%d %d %d %d\n",(t+k)->execution_time,(t+k)->inter_arrival_time,(t+k)->deadline,(t+k)->priority);
 	}
-
+	struct task *p=t;
+	struct task *q=t->next;
+	struct task *q2=t->next->next;
+	int chigh=wcrt(p,1);
+	int clow=wcrt(q,2);
+	int clow2=wcrt(q2,3);
+	printf("rhigh:%d,rlow:%d,rlow2:%d\n",chigh,clow,clow2);
 	return 0;
 }
