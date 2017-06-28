@@ -113,6 +113,14 @@ int wcrt(struct task *t,int priority){
 
 }
 
+void all_wcrt(struct task *t){
+	while(t!=NULL){
+		int worst_time=wcrt(t,t->priority);
+		printf("Priority %d task's wosrt-case response time is: %d\n",t->priority,worst_time);
+		t=t->next;
+	}
+
+}
 
 int main(int argc, char *argv[]){
 	FILE *fp=NULL;
@@ -126,12 +134,6 @@ int main(int argc, char *argv[]){
 		printf("%d %d %d %d\n",(t+k)->execution_time,(t+k)->inter_arrival_time,(t+k)->deadline,(t+k)->priority);
 	}
 
-	struct task *p=t;
-	struct task *q=t->next;
-	struct task *q2=t->next->next;
-	int chigh=wcrt(p,1);
-	int clow=wcrt(q,2);
-	int clow2=wcrt(q2,3);
-	printf("rhigh:%d,rlow:%d,rlow2:%d\n",chigh,clow,clow2);
+	all_wcrt(t);
 	return 0;
 }

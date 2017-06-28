@@ -19,6 +19,8 @@ int count_lines_number(FILE *fp,char *name);
 
 int find_max(int *table);
 
+void all_wcrt(struct task *t);
+
 int wcrt(struct task *t,int priority);
 
 #endif
