@@ -22,4 +22,5 @@ with such arbitrary deadlines. Lehoczky points out that neither the rate monoton
 priority ordering policies are optimal for tasks with arbitrary deadlines. We will reproduce here an 
 algorithm which finds the optimal priority ordering for any task set.
 
-And I will realize the algorithm which Lehoczky has described.
+And I will realize the algorithm which Lehoczky has described which will calculate the worst-case response
+time of several given tasks.
