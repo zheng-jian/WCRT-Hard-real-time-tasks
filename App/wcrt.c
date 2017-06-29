@@ -59,15 +59,6 @@ int count_lines_number(FILE *fp,char *name){
 	return n;
 }
 
-int find_max(int *w){
-	int temp=0;
-	for (int i = 0; i < 20; ++i)
-	{
-		if(w[i]>temp)
-			temp=w[i];
-	}
-	return temp;
-}
 
 int wcrt(struct task *t,int priority){
 	if(t->last==NULL)
@@ -85,12 +76,14 @@ int wcrt(struct task *t,int priority){
 			p=p->last;
 
 		}
-		int w[20]={1};
+		int max_wcrt=0;
+		int response_time=0;
 		int q=0;
 		int q1=1;
 		w0=t->execution_time;
 
-		for(int i=0;i<20;i++){
+		while(1){
+			int i=0;
 			while(1){
 			int sum=0;
 			for(int j=0;j<num_highPriority;j++){
@@ -99,18 +92,23 @@ int wcrt(struct task *t,int priority){
 			int q1=(i+1)*t->execution_time+sum;
 			w0=q1;
 			if(q1==q){
-				w[i]=q1-i*t->inter_arrival_time;
+				response_time=q1-i*t->inter_arrival_time;
 				w0=t->execution_time;
 				break;
 			}else{
 				q=q1;
 			}
 		}
+		if(q1<=(i+1)*t->inter_arrival_time){
+			max_wcrt=response_time;
+			break;
+		}else{
+			i++;
+		}
 	}
-		int max=find_max(w);
-		return max;
-	}
+		return max_wcrt;
 
+	}
 }
 
 void all_wcrt(struct task *t){
