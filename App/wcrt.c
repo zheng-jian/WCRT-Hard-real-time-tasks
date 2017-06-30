@@ -59,6 +59,37 @@ int count_lines_number(FILE *fp,char *name){
 	return n;
 }
 
+int estimate(struct task *t){
+	int count=0;
+	struct task *p=t;
+	while(p!=NULL){
+		count++;
+		p=p->next;
+	}
+	int *table_exeTime=(int *)malloc(sizeof(int)*count);
+	int *table_inter_arrTime=(int *)malloc(sizeof(int)*count);
+	for(int i=0;i<count;i++){
+		table_exeTime[i] = t->execution_time;
+		table_inter_arrTime[i] = t->inter_arrival_time;
+		t=t->next;
+	}
+	int denominator=1;
+	for(int i=0;i<count;i++)
+		denominator=denominator*table_inter_arrTime[i];
+
+	int numerator=0;
+	for(int i=0;i<count;i++){
+		numerator=numerator+table_exeTime[i]*denominator/table_inter_arrTime[i];
+	}
+	free(table_exeTime);
+	table_exeTime=NULL;
+	free(table_inter_arrTime);
+	table_inter_arrTime=NULL;
+	if(numerator>denominator)
+		return -1;
+	else
+		return 0;
+}
 
 int wcrt(struct task *t,int priority){
 	if(t->last==NULL)
@@ -84,28 +115,35 @@ int wcrt(struct task *t,int priority){
 
 		while(1){
 			int i=0;
+
 			while(1){
 			int sum=0;
 			for(int j=0;j<num_highPriority;j++){
 				sum=sum+(w0+table_intT[j]-1)/table_intT[j]*table_exeT[j];
 			}
 			int q1=(i+1)*t->execution_time+sum;
-			w0=q1;
 			if(q1==q){
 				response_time=q1-i*t->inter_arrival_time;
-				w0=t->execution_time;
 				break;
 			}else{
 				q=q1;
+				w0=q1;
 			}
 		}
-		if(q1<=(i+1)*t->inter_arrival_time){
+
+
+		if(response_time>=max_wcrt)
 			max_wcrt=response_time;
+		if(q1<=(i+1)*t->inter_arrival_time){
 			break;
 		}else{
 			i++;
 		}
 	}
+	free(table_exeT);
+	table_exeT=NULL;
+	free(table_intT);
+	table_intT=NULL;
 		return max_wcrt;
 
 	}
@@ -127,11 +165,14 @@ int main(int argc, char *argv[]){
 	struct task *t=NULL;
     t=initialization(t,a);
 	read_information(fp,argv[1],t,a);
-
+	
 	for(int k=0;k<a;k++){
 		printf("%d %d %d %d\n",(t+k)->execution_time,(t+k)->inter_arrival_time,(t+k)->deadline,(t+k)->priority);
 	}
-
-	all_wcrt(t);
+	if(estimate(t)==0){
+		all_wcrt(t);
+	}
+	else
+		printf("Error, cant complete all the tasks\n");
 	return 0;
 }
