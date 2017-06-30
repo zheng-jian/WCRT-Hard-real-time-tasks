@@ -3,15 +3,23 @@
 #include <math.h>
 #include "wcrt.h"
 
-
+/*	La fonction	initialization recois le nombre de task (int a) 
+	et le pointeur de le struct task(struct task *t), 
+	après elle cree l‘espace pour stocker les informations.
+*/
 struct task *initialization(struct task *t,int a){
 	t=(struct task*)malloc(a*sizeof(struct task));
 	for(int j=0;j<a;j++){
-		(t+j)->next=(struct task*)malloc(sizeof(struct task));
+		(t+j)->next=(struct task*)malloc(sizeof(struct task));	
+		//les pointeurs dans le struct doivent etre malloc 
 		(t+j)->last=(struct task*)malloc(sizeof(struct task));
 	}
 	return t;
 }
+
+/*	La fonction read_information transporte les donnees de un ficher .txt a
+	les structs, et connecter les pointeurs entre les structs.
+*/
 void read_information(FILE *fp, char *filename, struct task *a,int nmax){	
 	int i=0;
 	if((fp=fopen(filename,"r"))==NULL){
@@ -40,6 +48,10 @@ void read_information(FILE *fp, char *filename, struct task *a,int nmax){
 
 }
 
+/*	La fonction count_lines_number seulement calcule il y a combien de task
+	il lit le ficher ligne par ligne, si il y a un '\n', n++, a la fin il 
+	n'y a pas de '\n', on fait n=n+1
+*/
 int count_lines_number(FILE *fp,char *name){
 	int n=0;
 	int ch;
@@ -59,24 +71,32 @@ int count_lines_number(FILE *fp,char *name){
 	return n;
 }
 
+/*	La fonction estimate detecter si le processeur peut accomplir tous les 
+	tasks. C'est a dire la somme de tous les execution_time/inter_arrival_time doit 
+	etre inferieur a 1.
+*/
 int estimate(struct task *t){
 	int count=0;
 	struct task *p=t;
 	while(p!=NULL){
-		count++;
+		count++;	//calculer combien de task;
 		p=p->next;
 	}
 	int *table_exeTime=(int *)malloc(sizeof(int)*count);
 	int *table_inter_arrTime=(int *)malloc(sizeof(int)*count);
 	for(int i=0;i<count;i++){
-		table_exeTime[i] = t->execution_time;
+		//stocker les execution time de tous les tasks
+		table_exeTime[i] = t->execution_time;				
+		//stocker les inter arrival time de tous les tasks
 		table_inter_arrTime[i] = t->inter_arrival_time;
 		t=t->next;
 	}
+
+	//denominateur
 	int denominator=1;
 	for(int i=0;i<count;i++)
 		denominator=denominator*table_inter_arrTime[i];
-
+	//numerateur
 	int numerator=0;
 	for(int i=0;i<count;i++){
 		numerator=numerator+table_exeTime[i]*denominator/table_inter_arrTime[i];
@@ -91,6 +111,8 @@ int estimate(struct task *t){
 		return 0;
 }
 
+/*	La fonction wcrt calcule le worst-case response time d'un task
+*/
 int wcrt(struct task *t,int priority){
 	if(t->last==NULL)
 		return t->execution_time;
@@ -116,12 +138,16 @@ int wcrt(struct task *t,int priority){
 		while(1){
 			int i=0;
 
+			//Cet circulation calcule la fenetre occupee de la periode i
 			while(1){
 			int sum=0;
 			for(int j=0;j<num_highPriority;j++){
+				// calculer tous les execution_time des task superieurs
 				sum=sum+(w0+table_intT[j]-1)/table_intT[j]*table_exeT[j];
 			}
+			//temps de la fenetre occupee
 			int q1=(i+1)*t->execution_time+sum;
+			// si le temps occupee de cette foie egale la derniere foie, c'est fini
 			if(q1==q){
 				response_time=q1-i*t->inter_arrival_time;
 				break;
@@ -131,9 +157,10 @@ int wcrt(struct task *t,int priority){
 			}
 		}
 
-
+		//trouver le maximal temps response 
 		if(response_time>=max_wcrt)
 			max_wcrt=response_time;
+		//quand temps occupee est moins que (i+1) foie de periode, c'est fini,q ne augmente pas
 		if(q1<=(i+1)*t->inter_arrival_time){
 			break;
 		}else{
@@ -149,6 +176,8 @@ int wcrt(struct task *t,int priority){
 	}
 }
 
+/*	Cette founction affiche tous les wcrt de les tasks
+*/
 void all_wcrt(struct task *t){
 	while(t!=NULL){
 		int worst_time=wcrt(t,t->priority);
