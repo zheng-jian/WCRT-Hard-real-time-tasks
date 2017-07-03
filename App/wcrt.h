@@ -11,11 +11,8 @@ struct task
 	struct task *next;
 	struct task *last;
 };
-struct task *initialization(struct task *t,int a);
 
-void read_information(FILE *fp, char *filename, struct task *a,int nmax);
-
-int count_lines_number(FILE *fp,char *name);
+struct task *read_information(FILE *fp, char *filename);
 
 void all_wcrt(struct task *t);
 
